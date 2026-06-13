@@ -1,0 +1,20 @@
+{
+  "name": "ai-note-platform",
+  "version": "1.0.0",
+  "description": "AI 聊天筆記平台 - 期中作業",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": ["notes", "ai", "express", "rest-api"],
+  "author": "學生姓名",
+  "license": "MIT"
+}

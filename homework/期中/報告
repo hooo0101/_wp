@@ -1,0 +1,223 @@
+# NoteAI — AI 智慧筆記平台
+## 期中作業專案報告
+
+**課程：** 網頁程式設計  
+**繳交日期：** 2026/06/14  
+
+---
+
+## 一、專案動機與目標
+
+在學習程式課程的過程中，我發現自己需要同時處理多個問題：
+
+1. 筆記散落在不同地方（Notion、手機備忘錄、紙本）
+2. 複習時無法快速理解先前寫下的記錄
+3. 對某些概念有疑問時，需要切換到其他頁面查詢
+
+因此我決定做一個「AI 智慧筆記平台」，讓使用者可以邊記筆記，邊透過右側的 AI 助理即時提問、摘要或延伸學習。
+
+---
+
+## 二、系統架構
+
+```
+ai-note-platform/
+├── server/
+│   └── server.js          # Node.js + Express REST API
+├── public/
+│   └── index.html         # 前端單頁應用 (SPA)
+├── docs/
+│   ├── report.md          # 本報告
+│   └── learning-notes.md  # 學習筆記
+└── package.json
+```
+
+### 技術選擇
+
+| 層級 | 技術 | 理由 |
+|------|------|------|
+| 後端 | Node.js + Express | 課程主軸、JavaScript 統一前後端 |
+| 前端 | 原生 HTML/CSS/JS | 不依賴框架，理解 DOM 底層運作 |
+| 資料儲存 | JSON 檔案 (server) / localStorage (備援) | 輕量、不需安裝資料庫 |
+| AI 整合 | Anthropic Claude API | 強大的自然語言理解能力 |
+
+---
+
+## 三、功能說明
+
+### 3.1 筆記 CRUD
+
+系統提供完整的筆記管理功能，透過 RESTful API 實作：
+
+| HTTP 方法 | 路徑 | 功能 |
+|-----------|------|------|
+| GET | /api/notes | 取得所有筆記 |
+| POST | /api/notes | 新增筆記 |
+| PUT | /api/notes/:id | 更新筆記 |
+| DELETE | /api/notes/:id | 刪除筆記 |
+
+每篇筆記包含：
+- **title** — 標題
+- **content** — 內文
+- **tags** — 標籤（支援多個）
+- **createdAt / updatedAt** — 時間戳記
+
+### 3.2 AI 聊天助理
+
+右側面板整合 Claude API，支援：
+- 直接問答（一般知識問題）
+- **筆記上下文模式**：選取筆記後，AI 會以該筆記為背景回答
+- 快速操作按鈕（摘要、延伸、出題、簡化）
+
+AI API 呼叫範例（`server/server.js`）：
+```javascript
+const response = await fetch('https://api.anthropic.com/v1/messages', {
+  method: 'POST',
+  headers: {
+    'x-api-key': process.env.ANTHROPIC_API_KEY,
+    'anthropic-version': '2023-06-01'
+  },
+  body: JSON.stringify({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1024,
+    system: systemPrompt,
+    messages: [{ role: 'user', content: message }]
+  })
+});
+```
+
+### 3.3 離線備援
+
+當 Server 無法連線時，前端自動切換到 `localStorage` 儲存模式，確保使用者不會遺失資料。這個設計示範了「漸進式增強」（Progressive Enhancement）的概念。
+
+### 3.4 搜尋功能
+
+實作即時搜尋（即時過濾，不需送出表單），同時搜尋標題、內容與標籤。
+
+---
+
+## 四、核心程式碼解析
+
+### 後端：Express 路由
+
+```javascript
+// 新增筆記
+app.post('/api/notes', (req, res) => {
+  const { title, content, tags } = req.body;
+  const newNote = {
+    id: Date.now().toString(),  // 用時間戳記作為唯一 ID
+    title, content,
+    tags: tags || [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  notes.push(newNote);
+  writeNotes(notes);           // 寫入 JSON 檔案
+  res.status(201).json(newNote);
+});
+```
+
+### 前端：非同步 fetch
+
+```javascript
+async function saveNote() {
+  const body = { title, content, tags };
+  try {
+    // 優先嘗試 Server 端 API
+    const res = await fetch(`${API}/notes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const saved = await res.json();
+    notes.unshift(saved);
+  } catch {
+    // 若 Server 不通，改用 localStorage
+    localStorage.setItem('notes', JSON.stringify(notes));
+  }
+}
+```
+
+---
+
+## 五、使用說明
+
+### 安裝與啟動
+
+```bash
+# 1. 安裝套件
+npm install
+
+# 2. 設定 API Key（選用，沒有仍可使用筆記功能）
+export ANTHROPIC_API_KEY="你的金鑰"
+
+# 3. 啟動 Server
+npm start
+
+# 4. 開啟瀏覽器
+open http://localhost:3000
+```
+
+### 操作流程
+
+1. 點選左上角「＋ 新增」建立筆記
+2. 輸入標題、內容、標籤
+3. 按 `Ctrl+S` 或「儲存」按鈕儲存
+4. 在右側 AI 面板輸入問題，或點選快速操作按鈕
+5. AI 會自動參考目前開啟的筆記來回答
+
+---
+
+## 六、遭遇的困難與解決
+
+### 困難 1：CORS 跨域問題
+前端在 `http://localhost:3000` 呼叫同一主機的 API 本來沒問題，但開發時我用 Live Server（port 5500）開前端，導致 CORS 錯誤。
+
+**解決方式：** 在 Express 加入 `cors()` 中介軟體：
+```javascript
+const cors = require('cors');
+app.use(cors());
+```
+
+### 困難 2：AI API Key 安全性
+如果把 API Key 放在前端 JS，任何人都能看到。
+
+**解決方式：** API Key 只放在後端 server，前端的所有 AI 請求都透過自己的 `/api/chat` 轉發。
+
+### 困難 3：沒有資料庫時的資料持久化
+不想安裝 MongoDB 或 SQLite。
+
+**解決方式：** 用 Node.js 的 `fs` 模組把資料寫入 `notes.json`。雖然不適合高並發，但對個人使用完全足夠。
+
+---
+
+## 七、學習心得
+
+這個專案讓我實際體會到「全端開發」的完整流程：
+
+- **前端**：了解 SPA（單頁應用）如何不刷新頁面就更新內容
+- **後端**：理解 REST API 的設計邏輯（資源、HTTP 動詞、狀態碼）
+- **非同步**：深入理解 `async/await` 和錯誤處理的重要性
+- **API 整合**：第一次串接外部 AI API，了解如何管理 API Key 安全性
+
+最有趣的部分是「AI 上下文注入」——把使用者的筆記塞進 system prompt，讓 AI 能針對特定內容回答。這讓我理解到 AI 的「智慧」很大程度上取決於如何提示它。
+
+---
+
+## 八、未來改進方向
+
+1. **使用者登入系統**：加入 JWT 身份驗證，讓多人可以有自己的筆記
+2. **Markdown 渲染**：讓筆記支援 Markdown 格式（用 marked.js）
+3. **資料庫遷移**：改用 SQLite 或 PostgreSQL 取代 JSON 檔案
+4. **即時同步**：用 WebSocket 讓多個瀏覽器視窗的筆記即時同步
+5. **筆記分享**：產生分享連結讓他人閱讀（只讀模式）
+
+---
+
+## 九、參考資料
+
+- [Express.js 官方文件](https://expressjs.com/)
+- [Anthropic API 文件](https://docs.anthropic.com/)
+- [MDN Fetch API](https://developer.mozilla.org/zh-TW/docs/Web/API/Fetch_API)
+- [Node.js fs 模組](https://nodejs.org/api/fs.html)
+- 課堂講義與投影片
