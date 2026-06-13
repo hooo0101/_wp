@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>個人資料問卷調查</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f0;
+      color: #1a1a1a;
+      line-height: 1.7;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .wrap {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #e0ddd6;
+    }
+    .header h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+    .header p { font-size: 14px; color: #666; }
+
+    /* Progress bar */
+    .progress {
+      background: #e8e6df;
+      border-radius: 99px;
+      height: 6px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: #7F77DD;
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Section cards */
+    .section {
+      background: #fff;
+      border: 1px solid #e0ddd6;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Fields */
+    .field { margin-bottom: 1.25rem; }
+    .field:last-child { margin-bottom: 0; }
+    .field label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+    .field label .req { color: #d94f4f; margin-left: 2px; }
+    .hint { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+    /* Two-column layout */
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
+
+    /* Inputs */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1a1a1a;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="tel"]:focus,
+    input[type="date"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #7F77DD;
+      box-shadow: 0 0 0 3px rgba(127, 119, 221, 0.15);
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+
+    /* Color input */
+    input[type="color"] {
+      width: 100%;
+      height: 44px;
+      padding: 4px 6px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #fff;
+    }
+    .color-preview {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .color-swatch {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1px solid #ddd;
+      background: #7F77DD;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .color-name { font-size: 13px; color: #666; }
+
+    /* Range */
+    .range-wrap { display: flex; align-items: center; gap: 12px; }
+    .range-wrap input[type="range"] { flex: 1; accent-color: #7F77DD; }
+    .range-val { font-size: 14px; font-weight: 600; min-width: 24px; text-align: right; }
+    .range-labels { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-top: 4px; }
+
+    /* Radio */
+    .radio-group, .check-group { display: flex; flex-direction: column; gap: 8px; }
+    .radio-item, .check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid #e0ddd6;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      user-select: none;
+    }
+    .radio-item:hover, .check-item:hover { background: #fafaf7; }
+    .radio-item.selected, .check-item.selected {
+      background: #f0effe;
+      border-color: #b0a8f0;
+    }
+    .radio-item input, .check-item input {
+      width: 16px; height: 16px; margin: 0;
+      flex-shrink: 0; cursor: pointer;
+      accent-color: #7F77DD;
+    }
+    .radio-item span, .check-item span { font-size: 14px; color: #1a1a1a; }
+
+    /* Submit */
+    .submit-wrap { text-align: center; margin-top: 2rem; }
+    .submit-btn {
+      background: #7F77DD;
+      color: #fff;
+      border: none;
+      padding: 12px 48px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Success */
+    .success-msg {
+      display: none;
+      background: #edf7ed;
+      border: 1px solid #a3d9a5;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      color: #2e7d32;
+      font-size: 15px;
+      font-weight: 500;
+      margin-top: 1.5rem;
+    }
+    .success-msg .icon { font-size: 36px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="header">
+    <h1>📋 個人資料問卷調查</h1>
+    <p>請填寫以下欄位，帶有 <span style="color:#d94f4f">*</span> 為必填項目</p>
+  </div>
+
+  <div class="progress">
+    <div class="progress-bar" id="prog"></div>
+  </div>
+
+  <!-- 基本資料 -->
+  <div class="section">
+    <div class="section-title">基本資料</div>
+
+    <div class="row">
+      <div class="field">
+        <label for="fname">姓名<span class="req">*</span></label>
+        <input type="text" id="fname" placeholder="請輸入您的姓名" autocomplete="name" oninput="updateProgress()">
+      </div>
+      <div class="field">
+        <label for="job">職業</label>
+        <select id="job">
+          <option value="">— 請選擇 —</option>
+          <option>學生</option>
+          <option>工程師</option>
+          <option>設計師</option>
+          <option>教師</option>
+          <option>醫療人員</option>
+          <option>自由工作者</option>
+          <option>其他</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="bdate">出生日期<span class="req">*</span></label>
+      <input type="date" id="bdate" max="2010-12-31" oninput="updateProgress()">
+    </div>
+  </div>
+
+  <!-- 聯絡方式 -->
+  <div class="section">
+    <div class="section-title">聯絡方式</div>
+
+    <div class="field">
+      <label for="email">電子郵件<span class="req">*</span></label>
+      <input type="email" id="email" placeholder="example@mail.com" autocomplete="email" oninput="updateProgress()">
+      <p class="hint">用於寄送問卷結果</p>
+    </div>
+
+    <div class="field">
+      <label for="tel">電話號碼</label>
+      <input type="tel" id="tel" placeholder="09XX-XXX-XXX" autocomplete="tel">
+    </div>
+  </div>
+
+  <!-- 性別 -->
+  <div class="section">
+    <div class="section-title">性別<span class="req" style="color:#d94f4f">*</span></div>
+    <div class="field">
+      <div class="radio-group" id="gender-group">
+        <label class="radio-item" onclick="selectRadio(this)">
+          <input type="radio" name="gender" value="male"> <span>男性</span>
+        </label>
+        <label class="radio-item" onclick="selectRadio(this)">
+          <input type="radio" name="gender" value="female"> <span>女性</span>
+        </label>
+        <label class="radio-item" onclick="selectRadio(this)">
+          <input type="radio" name="gender" value="nonbinary"> <span>非二元性別</span>
+        </label>
+        <label class="radio-item" onclick="selectRadio(this)">
+          <input type="radio" name="gender" value="prefer_not"> <span>不方便透露</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 興趣愛好 -->
+  <div class="section">
+    <div class="section-title">興趣愛好</div>
+
+    <div class="field">
+      <div class="check-group" id="hobby-group">
+        <label class="check-item" onclick="toggleCheck(this)">
+          <input type="checkbox" value="reading"> <span>閱讀</span>
+        </label>
+        <label class="check-item" onclick="toggleCheck(this)">
+          <input type="checkbox" value="music"> <span>音樂</span>
+        </label>
+        <label class="check-item" onclick="toggleCheck(this)">
+          <input type="checkbox" value="sports"> <span>運動</span>
+        </label>
+        <label class="check-item" onclick="toggleCheck(this)">
+          <input type="checkbox" value="travel"> <span>旅遊</span>
+        </label>
+        <label class="check-item" onclick="toggleCheck(this)">
+          <input type="checkbox" value="cooking"> <span>烹飪</span>
+        </label>
+        <label class="check-item" onclick="toggleCheck(this)">
+          <input type="checkbox" value="gaming"> <span>電玩</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="other-hobby">其他興趣（文字填寫）</label>
+      <input type="text" id="other-hobby" placeholder="請輸入其他興趣愛好…">
+    </div>
+  </div>
+
+  <!-- 偏好設定 -->
+  <div class="section">
+    <div class="section-title">偏好設定</div>
+
+    <div class="field">
+      <label for="fav-color">最喜歡的顏色</label>
+      <input type="color" id="fav-color" value="#7F77DD" oninput="updateSwatch(this)">
+      <div class="color-preview">
+        <div class="color-swatch" id="swatch"></div>
+        <span class="color-name" id="hex-label">#7F77DD</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="satisfy">整體滿意度</label>
+      <div class="range-wrap">
+        <input type="range" id="satisfy" min="1" max="10" value="5" step="1"
+               oninput="document.getElementById('satisfy-val').textContent=this.value">
+        <span class="range-val" id="satisfy-val">5</span>
+      </div>
+      <div class="range-labels"><span>非常不滿意</span><span>非常滿意</span></div>
+    </div>
+  </div>
+
+  <!-- 留言 -->
+  <div class="section">
+    <div class="section-title">留言</div>
+    <div class="field">
+      <label for="msg">意見或建議</label>
+      <textarea id="msg" rows="4" placeholder="請在此輸入您的意見、建議或任何想說的話…" oninput="updateProgress()"></textarea>
+      <p class="hint">字數不限，歡迎詳細描述</p>
+    </div>
+  </div>
+
+  <div class="submit-wrap">
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()">送出問卷</button>
+  </div>
+
+  <div class="success-msg" id="success">
+    <div class="icon">✅</div>
+    感謝您填寫問卷！我們已收到您的資料。
+  </div>
+</div>
+
+<script>
+  function updateSwatch(el) {
+    document.getElementById('swatch').style.background = el.value;
+    document.getElementById('hex-label').textContent = el.value.toUpperCase();
+  }
+
+  function selectRadio(label) {
+    document.querySelectorAll('#gender-group .radio-item').forEach(l => l.classList.remove('selected'));
+    label.classList.add('selected');
+    updateProgress();
+  }
+
+  function toggleCheck(label) {
+    label.classList.toggle('selected', label.querySelector('input').checked);
+  }
+
+  function updateProgress() {
+    let filled = 0;
+    const total = 4;
+    if (document.getElementById('fname').value.trim()) filled++;
+    if (document.getElementById('email').value.trim()) filled++;
+    if (document.getElementById('bdate').value) filled++;
+    if (document.querySelector('input[name="gender"]:checked')) filled++;
+    document.getElementById('prog').style.width = Math.round((filled / total) * 100) + '%';
+  }
+
+  function submitForm() {
+    const name = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const bdate = document.getElementById('bdate').value;
+    const gender = document.querySelector('input[name="gender"]:checked');
+
+    if (!name) { alert('請填寫姓名'); return; }
+    if (!email || !email.includes('@')) { alert('請填寫正確的電子郵件'); return; }
+    if (!bdate) { alert('請填寫出生日期'); return; }
+    if (!gender) { alert('請選擇性別'); return; }
+
+    document.getElementById('prog').style.width = '100%';
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '已送出 ✓';
+
+    const success = document.getElementById('success');
+    success.style.display = 'block';
+    success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+</script>
+
+</body>
+</html>

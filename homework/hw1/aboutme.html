@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>許荷 — 個人網頁</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1a1a;
+      --ink-soft: #4a4a4a;
+      --ink-muted: #888;
+      --paper: #faf8f4;
+      --paper-warm: #f2ede4;
+      --accent: #3a6b5a;
+      --accent-light: #e8f0ec;
+      --line: rgba(0,0,0,0.1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-weight: 300;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      line-height: 1.8;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      align-items: center;
+    }
+
+    .hero-left {
+      padding: 4rem 4rem 4rem 6vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .label {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-name {
+      font-family: 'Noto Serif TC', serif;
+      font-size: clamp(3.5rem, 9vw, 7rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
+    .hero-name span {
+      display: block;
+      color: var(--accent);
+    }
+
+    .hero-title {
+      margin-top: 2rem;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      color: var(--ink-soft);
+      font-weight: 400;
+      border-left: 2px solid var(--accent);
+      padding-left: 1rem;
+    }
+
+    .divider-line {
+      background: var(--line);
+      height: 50%;
+      width: 1px;
+    }
+
+    .hero-right {
+      padding: 4rem 6vw 4rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    /* ── CONTACT ITEMS ── */
+    .contact-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .contact-label {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .contact-value {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--ink);
+    }
+
+    .contact-value a {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--line);
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .contact-value a:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* ── BOTTOM BAR ── */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent) 0%, #6ba691 100%);
+    }
+
+    /* ── SCROLL HINT ── */
+    .scroll-hint {
+      position: fixed;
+      bottom: 2rem;
+      right: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.3;
+    }
+
+    .scroll-hint span {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      writing-mode: vertical-rl;
+      color: var(--ink);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 48px;
+      background: var(--ink);
+      animation: scrollDown 1.6s ease-in-out infinite;
+    }
+
+    @keyframes scrollDown {
+      0%   { transform: scaleY(0); transform-origin: top; }
+      50%  { transform: scaleY(1); transform-origin: top; }
+      51%  { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ── ABOUT SECTION ── */
+    .section {
+      padding: 8rem 6vw;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      padding-top: 6px;
+    }
+
+    .section-body p {
+      font-size: 16px;
+      color: var(--ink-soft);
+      line-height: 2;
+    }
+
+    /* ── INFO GRID ── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .info-card {
+      background: var(--paper-warm);
+      padding: 1.5rem;
+      border-radius: 2px;
+    }
+
+    .info-card-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .info-card-value {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 15px;
+      color: var(--ink);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 720px) {
+      .hero {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        min-height: auto;
+        padding: 4rem 2rem;
+        gap: 3rem;
+      }
+
+      .hero-left { padding: 0; }
+      .hero-right { padding: 0; gap: 2rem; }
+      .divider-line { display: none; }
+
+      .section-inner {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .info-grid { grid-template-columns: 1fr; }
+      .scroll-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero" aria-label="個人介紹">
+    <div class="hero-left">
+      <p class="label">個人主頁 · Personal Page</p>
+      <h1 class="hero-name">
+        許<span>荷</span>
+      </h1>
+      <p class="hero-title">學生 · Student</p>
+    </div>
+
+    <div class="divider-line" aria-hidden="true"></div>
+
+    <div class="hero-right">
+      <div class="contact-item">
+        <span class="contact-label">電子郵件</span>
+        <span class="contact-value">
+          <a href="mailto:s111110564@student.nqu.edu.tw">s111110564@student.nqu.edu.tw</a>
+        </span>
+      </div>
+
+      <div class="contact-item">
+        <span class="contact-label">聯絡電話</span>
+        <span class="contact-value">
+          <a href="tel:+886966482249">0966-482-249</a>
+        </span>
+      </div>
+
+      <div class="contact-item">
+        <span class="contact-label">職稱</span>
+        <span class="contact-value">學生</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" aria-label="基本資料">
+    <div class="section-inner">
+      <p class="section-label">基本資料</p>
+      <div class="section-body">
+        <p>您好，我是許荷，目前就讀於大學。歡迎透過以下資訊與我取得聯繫。</p>
+        <div class="info-grid">
+          <div class="info-card">
+            <p class="info-card-label">姓名</p>
+            <p class="info-card-value">許荷</p>
+          </div>
+          <div class="info-card">
+            <p class="info-card-label">職稱</p>
+            <p class="info-card-value">學生</p>
+          </div>
+          <div class="info-card">
+            <p class="info-card-label">電子郵件</p>
+            <p class="info-card-value" style="font-size:13px;">
+              <a href="mailto:s111110564@student.nqu.edu.tw" style="color:inherit; text-decoration:none; border-bottom:1px solid rgba(0,0,0,0.1);">s111110564@student.nqu.edu.tw</a>
+            </p>
+          </div>
+          <div class="info-card">
+            <p class="info-card-label">聯絡電話</p>
+            <p class="info-card-value">
+              <a href="tel:+886966482249" style="color:inherit; text-decoration:none;">0966-482-249</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCROLL HINT -->
+  <div class="scroll-hint" aria-hidden="true">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+
+  <!-- BOTTOM ACCENT BAR -->
+  <div class="bottom-bar" aria-hidden="true"></div>
+
+</body>
+</html>
